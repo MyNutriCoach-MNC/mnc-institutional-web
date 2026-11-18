@@ -1,3 +1,4 @@
+import PreviewNotice from "./components/PreviewNotice"
 import { SiteFooter, SiteHeader } from "./components/site"
 
 const CONTACT_EMAIL = "admin@mynutricoach.com.ar"
@@ -205,6 +206,7 @@ function PrivacyPage() {
       </main>
 
       <SiteFooter base="/" />
+      <PreviewNotice />
     </div>
   )
 }

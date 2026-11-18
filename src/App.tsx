@@ -1,4 +1,5 @@
 import { FormEvent, useLayoutEffect, useState } from "react"
+import PreviewNotice from "./components/PreviewNotice"
 import { ButtonLink, Icon, type IconName, SiteFooter, SiteHeader } from "./components/site"
 
 function SectionHeading({
@@ -840,6 +841,7 @@ function App() {
       </main>
 
       <SiteFooter />
+      <PreviewNotice />
     </div>
   )
 }
