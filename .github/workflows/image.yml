@@ -1,0 +1,69 @@
+# Publishes the production build of the institutional site to GHCR. The image only holds
+# the files under /web: the server's deploy.sh copies them for Caddy, so the 1 GB server
+# never builds. See mnc-back/deploy/README.md.
+#
+# Tags: sha-<short commit> (immutable, for rollback) and the branch name.
+name: image
+
+on:
+  push:
+    branches: [staging, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: image-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE: ghcr.io/mynutricoach-mnc/mnc-institutional-web
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm build
+
+  image:
+    needs: check
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=sha,prefix=sha-
+            type=ref,event=branch
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Repo variable; set it to "false" when the site launches.
+          build-args: |
+            VITE_SHOW_PREVIEW_NOTICE=${{ vars.VITE_SHOW_PREVIEW_NOTICE || 'true' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
