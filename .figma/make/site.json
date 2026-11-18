@@ -1,10 +1,12 @@
 {
-  "description": "MyNutriCoach connects nutrition professionals with patients through AI-driven support, enhancing continuity of care and organizing nutritional data.",
+  "description": "Acompañamiento nutricional asistido por IA, supervisado por tu nutricionista.",
   "robots": {
     "index": false
   },
   "accessibility": {
     "addBypassLinks": false,
     "ignoreReducedMotion": false
-  }
+  },
+  "title": "MyNutriCoach",
+  "language": "es"
 }

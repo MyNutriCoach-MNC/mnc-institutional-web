@@ -16,6 +16,13 @@ export default defineConfig(({ mode }) => {
     build: {
       sourcemap: emitSourcemaps ? 'inline' : false,
       minify: !emitSourcemaps,
+      rollupOptions: {
+        // Multi-página: la landing y la política de privacidad (/privacidad/).
+        input: {
+          main: path.resolve(__dirname, "index.html"),
+          privacidad: path.resolve(__dirname, "privacidad/index.html"),
+        },
+      },
     },
     plugins: [
 react(),
